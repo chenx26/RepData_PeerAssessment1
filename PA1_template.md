@@ -254,15 +254,23 @@ df.weekend = data.frame(steps = average_steps_by_interval_weekend,
                         interval = unique_time_intervals,
                         daytype = "weekend")
 
-par(mfrow = c(2,1))
-plot(unique_time_intervals, average_steps_by_interval_weekday, type = "l", main = "Weekday")
-plot(unique_time_intervals, average_steps_by_interval_weekend, type = "l", main = "Weekend")
+average_activity_impute_na_by_interval = rbind(df.weekday, df.weekend)
+average_activity_impute_na_by_interval$daytype = factor(average_activity_impute_na_by_interval$daytype)
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 
 ```r
-par(mfrow = c(1,1))
+library(ggplot2)
+p = ggplot(average_activity_impute_na_by_interval, aes(x = interval, y = steps, group = 1))
+p + geom_line() + facet_wrap(~daytype, ncol = 1)
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+
+
+
+
 
 

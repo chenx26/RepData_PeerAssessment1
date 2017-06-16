@@ -13,7 +13,7 @@ obervation.
 
 ```{r}
 rm(list=ls())
-activity = read.csv("activity.csv", colClasses = c("integer", "character", "character"))
+activity = read.csv("activity.csv", colClasses = c("integer", "character", "integer"))
 datetime = do.call(c, apply(activity, 1, 
                  function(tmp){
                        hour = as.numeric(tmp[3]) %/% 60
@@ -116,12 +116,11 @@ Next, we replace the NAs with the average of the same interval
 
 # find the index of NA rows
 idx_na = which(is.na(activity$steps))
-
 activity_impute_na = activity
 
 # for each idx_na, replace the step with the average of the same interval
 for(idx in idx_na){
-        activity_impute_na[idx,'steps'] =  average_steps_by_interval[activity$interval[idx]]
+        activity_impute_na[idx,'steps'] =  average_steps_by_interval[as.character(activity$interval[idx])]
 }
 
 # now the number of NAs is zero
@@ -199,19 +198,21 @@ df.weekend = data.frame(steps = average_steps_by_interval_weekend,
 
 average_activity_impute_na_by_interval = rbind(df.weekday, df.weekend)
 average_activity_impute_na_by_interval$daytype = factor(average_activity_impute_na_by_interval$daytype)
-average_activity_impute_na_by_interval$interval = as.numeric(average_activity_impute_na_by_interval$interval)
-
-
-# par(mfrow = c(2,1))
-# plot(unique_time_intervals, average_steps_by_interval_weekday, type = "l", main = "Weekday")
-# plot(unique_time_intervals, average_steps_by_interval_weekend, type = "l", main = "Weekend")
-# par(mfrow = c(1,1))
-
-        
-library(ggplot2)
-p = ggplot(average_activity_impute_na_by_interval, aes(x = interval, y = steps, group = 1))
-p + geom_line() + facet_wrap(~daytype)
 
 ```
+
+
+```{r, fig.width=3, fig.height=2}
+
+library(ggplot2)
+p = ggplot(average_activity_impute_na_by_interval, aes(x = interval, y = steps, group = 1))
+p + geom_line() + facet_wrap(~daytype, ncol = 2)
+
+```
+
+
+
+
+
 
 
