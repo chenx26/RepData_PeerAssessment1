@@ -78,9 +78,19 @@ The following is a time series plot of the number of steps at each
 
 
 ```r
-plot(activity$datetime, activity$steps, type = "l",
-                main = "number of steps over time")
-abline(h = mean(activity$steps, na.rm = TRUE), col = "red")
+# find unique time intervals
+unique_time_intervals = unique(activity$interval)
+
+average_steps_by_interval = sapply(unique_time_intervals, 
+       function(x) {
+               mean(subset(activity, activity$interval == x)$steps, 
+                    na.rm = TRUE)
+       }
+)
+names(average_steps_by_interval) = unique_time_intervals
+
+plot(unique_time_intervals, average_steps_by_interval , type = "l",
+                main = "average number of steps over time")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
@@ -215,15 +225,44 @@ activity_impute_na = cbind(activity_impute_na, daytype)
 Next, we plot the time series of the steps taken, grouped by type of day
 
 ```r
-library(ggplot2)
-p = ggplot(activity_impute_na, aes(x = datetime, y = steps))
-p + geom_line() + facet_wrap(~daytype)
-```
+activity_impute_na_weekday = subset(activity_impute_na,
+                                     activity_impute_na$daytype == "weekday")
 
-```
-## Warning: Removed 1776 rows containing missing values (geom_path).
+activity_impute_na_weekend = subset(activity_impute_na,
+                                     activity_impute_na$daytype == "weekend")
+
+
+average_steps_by_interval_weekday = sapply(unique_time_intervals, 
+       function(x) {
+               mean(subset(activity_impute_na_weekday, 
+                           activity_impute_na_weekday$interval == x)$steps)
+       }
+)
+
+average_steps_by_interval_weekend = sapply(unique_time_intervals, 
+       function(x) {
+               mean(subset(activity_impute_na_weekend, 
+                           activity_impute_na_weekend$interval == x)$steps)
+       }
+)
+
+df.weekday = data.frame(steps = average_steps_by_interval_weekday,
+                        interval = unique_time_intervals,
+                        daytype = "weekday")
+
+df.weekend = data.frame(steps = average_steps_by_interval_weekend,
+                        interval = unique_time_intervals,
+                        daytype = "weekend")
+
+par(mfrow = c(2,1))
+plot(unique_time_intervals, average_steps_by_interval_weekday, type = "l", main = "Weekday")
+plot(unique_time_intervals, average_steps_by_interval_weekend, type = "l", main = "Weekend")
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
+```r
+par(mfrow = c(1,1))
+```
 
 
