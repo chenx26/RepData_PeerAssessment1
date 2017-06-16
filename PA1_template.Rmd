@@ -202,7 +202,7 @@ average_activity_impute_na_by_interval$daytype = factor(average_activity_impute_
 ```
 
 
-```{r, fig.width=3, fig.height=2}
+```{r}
 
 library(ggplot2)
 p = ggplot(average_activity_impute_na_by_interval, aes(x = interval, y = steps, group = 1))

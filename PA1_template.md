@@ -9,7 +9,7 @@ obervation.
 
 ```r
 rm(list=ls())
-activity = read.csv("activity.csv", colClasses = c("integer", "character", "character"))
+activity = read.csv("activity.csv", colClasses = c("integer", "character", "integer"))
 datetime = do.call(c, apply(activity, 1, 
                  function(tmp){
                        hour = as.numeric(tmp[3]) %/% 60
@@ -28,7 +28,7 @@ str(activity)
 ## 'data.frame':	17568 obs. of  4 variables:
 ##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
 ##  $ date    : chr  "2012-10-01" "2012-10-01" "2012-10-01" "2012-10-01" ...
-##  $ interval: chr  "0" "5" "10" "15" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ##  $ datetime: POSIXct, format: "2012-10-01 00:00:00" "2012-10-01 00:05:00" ...
 ```
 
@@ -120,7 +120,7 @@ idx = which.max(average_steps_by_interval)
 ```
 
 ```
-## [1] "835"
+## [1] 835
 ```
 
 ```r
@@ -153,12 +153,11 @@ Next, we replace the NAs with the average of the same interval
 ```r
 # find the index of NA rows
 idx_na = which(is.na(activity$steps))
-
 activity_impute_na = activity
 
 # for each idx_na, replace the step with the average of the same interval
 for(idx in idx_na){
-        activity_impute_na[idx,'steps'] =  average_steps_by_interval[activity$interval[idx]]
+        activity_impute_na[idx,'steps'] =  average_steps_by_interval[as.character(activity$interval[idx])]
 }
 
 # now the number of NAs is zero
@@ -263,7 +262,7 @@ average_activity_impute_na_by_interval$daytype = factor(average_activity_impute_
 ```r
 library(ggplot2)
 p = ggplot(average_activity_impute_na_by_interval, aes(x = interval, y = steps, group = 1))
-p + geom_line() + facet_wrap(~daytype, ncol = 1)
+p + geom_line() + facet_wrap(~daytype, ncol = 2)
 ```
 
 ![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
