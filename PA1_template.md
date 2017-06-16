@@ -1,17 +1,13 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: Xin Chen
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+Xin Chen  
 
 ## Loading and preprocessing the data
 
 We create a new variable called "datetime", which is the time stamp for each
 obervation.
 
-```{r}
+
+```r
 rm(list=ls())
 activity = read.csv("activity.csv", colClasses = c("integer", "character", "character"))
 datetime = do.call(c, apply(activity, 1, 
@@ -28,8 +24,17 @@ activity = cbind(activity, datetime)
 str(activity)
 ```
 
+```
+## 'data.frame':	17568 obs. of  4 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : chr  "2012-10-01" "2012-10-01" "2012-10-01" "2012-10-01" ...
+##  $ interval: chr  "0" "5" "10" "15" ...
+##  $ datetime: POSIXct, format: "2012-10-01 00:00:00" "2012-10-01 00:05:00" ...
+```
+
 ## What is mean total number of steps taken per day?
-```{r}
+
+```r
 # remove NA rows
 activity_noNA = subset(activity, !is.na(activity$steps))
 
@@ -44,13 +49,26 @@ total_steps = sapply(unique_dates,
 
 # plot histogram
 hist(total_steps, main = "Histogram of total steps per day")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)<!-- -->
+
+```r
 # compute the mean
 (mean_steps = mean(total_steps))
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 # compute the median
 (median_steps = median(total_steps))
+```
 
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
@@ -58,15 +76,19 @@ hist(total_steps, main = "Histogram of total steps per day")
 The following is a time series plot of the number of steps at each
 5-minute time interval
 
-```{r}
+
+```r
 plot(activity$datetime, activity$steps, type = "l",
                 main = "number of steps over time")
 abline(h = mean(activity$steps, na.rm = TRUE), col = "red")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png)<!-- -->
+
 Next we find the time interval with the highest average number of steps
 
-```{r}
+
+```r
 # find unique time intervals
 unique_time_intervals = unique(activity$interval)
 
@@ -85,24 +107,40 @@ idx = which.max(average_steps_by_interval)
 
 # time interval with the maximum average number of steps
 (max_interval = unique_time_intervals[idx])
+```
 
+```
+## [1] "835"
+```
+
+```r
 # the maximum average number of steps per interval
 (steps_at_max_interval = average_steps_by_interval[idx])
+```
+
+```
+##      835 
+## 206.1698
 ```
 
 ## Imputing missing values
 
 First, find out how many NAs are in the dataset.
 
-```{r}
+
+```r
 # The number of NAs is
 (number_of_NA = sum(is.na(activity$steps)))
 ```
 
+```
+## [1] 2304
+```
+
 Next, we replace the NAs with the average of the same interval
 
-```{r}
 
+```r
 # find the index of NA rows
 idx_na = which(is.na(activity$steps))
 
@@ -115,7 +153,13 @@ for(idx in idx_na){
 
 # now the number of NAs is zero
 sum(is.na(activity_impute_na$steps))
+```
 
+```
+## [1] 0
+```
+
+```r
 # find unique dates after imputing NAs
 unique_dates = unique(activity_impute_na$date)
 
@@ -127,12 +171,26 @@ total_steps = sapply(unique_dates,
 
 # plot histogram after imputing NAs
 hist(total_steps, main = "Histogram of total steps per day after imputing NAs")
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
 # compute the mean after imputing NAs
 (mean_steps = mean(total_steps))
+```
 
+```
+## [1] 10766.19
+```
+
+```r
 # compute the median after imputing NAs
 (median_steps = median(total_steps))
+```
+
+```
+## [1] 10766.19
 ```
 
 Observe that the mean of the total steps per day did not change and the median changed slightly. This is because we are replacing the NAs with the mean of the same time interval. It is likely due to the fact that the NA periods in general have very low number of steps.
@@ -141,8 +199,8 @@ Observe that the mean of the total steps per day did not change and the median c
 
 First, we create a new factor variable to indicate whether a day is weekday or weekend
 
-```{r}
 
+```r
 day_of_week = weekdays(as.Date(activity_impute_na$date))
 daytype = factor(sapply(day_of_week,
                  function(x){
@@ -155,11 +213,17 @@ activity_impute_na = cbind(activity_impute_na, daytype)
 ```
 
 Next, we plot the time series of the steps taken, grouped by type of day
-```{r}
+
+```r
 library(ggplot2)
 p = ggplot(activity_impute_na, aes(x = datetime, y = steps))
 p + geom_line() + facet_wrap(~daytype)
+```
 
 ```
+## Warning: Removed 1776 rows containing missing values (geom_path).
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 
